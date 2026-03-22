@@ -8,6 +8,8 @@ import About from "@/components/sections/About";
 import Experience from "@/components/sections/Experience";
 import Projects from "@/components/sections/Projects";
 import Extracurriculars from "@/components/sections/Extracurriculars";
+import Contact from "@/components/sections/Contact";
+import DownloadResumeButton from "@/components/ui/DownloadResumeButton";
 import type { Resume } from "@/types/resume.types";
 
 export default function Home() {
@@ -58,6 +60,8 @@ export default function Home() {
           <Experience resume={resume} />
           <Projects resume={resume} />
           <Extracurriculars resume={resume} />
+          <Contact />
+          <DownloadResumeButton />
         </>
       )}
     </main>

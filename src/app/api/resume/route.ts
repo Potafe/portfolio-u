@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { parseLatexResume } from "@/hooks/parseResume";
+import { fetchLatexSource } from "@/lib/fetchResume";
 
-export function GET() {
-  const filePath = join(process.cwd(), "src", "data", "resume.sty");
-  const latexSource = readFileSync(filePath, "utf8");
+export async function GET() {
+  const latexSource = await fetchLatexSource();
   const resume = parseLatexResume(latexSource);
   return NextResponse.json(resume);
 }

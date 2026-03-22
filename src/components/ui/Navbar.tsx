@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
+import ThemeSwitcher from "@/components/ui/ThemeSwitcher";
 
 const NAV_LINKS = [
   { label: "About", href: "#about" },
   { label: "Experience", href: "#experience" },
   { label: "Projects", href: "#projects" },
   { label: "Beyond", href: "#extracurriculars" },
+  { label: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
@@ -115,6 +117,9 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
+
+          {/* Theme toggle */}
+          <ThemeSwitcher />
 
           {/* Hamburger */}
           <button
