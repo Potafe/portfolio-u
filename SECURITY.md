@@ -14,7 +14,7 @@ To securely report a vulnerability, please open an advisory on the affected GitH
 2. I will investigate and update the issue with relevant information.
 3. Commits will be handled in a private repository for review and testing.
 4. Release a new patch version from the private repository.
-5. Issue a security advistory through GitHub.
+5. Issue a security advisory through GitHub.
 6. Write a blog post about the vulnerability.
 
 ## Security Advisories
