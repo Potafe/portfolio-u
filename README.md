@@ -7,7 +7,7 @@ A code-first portfolio site that auto-generates itself from a single LaTeX résu
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
----
+
 
 ## What it looks like
 
@@ -21,7 +21,7 @@ A code-first portfolio site that auto-generates itself from a single LaTeX résu
 | **Beyond Code** | Extracurricular cards with entrance animations |
 | **Navbar** | Fixed top, GSAP entrance, scroll-aware backdrop blur, active-section tracking, mobile drawer |
 
----
+
 
 ## Tech stack
 
@@ -35,7 +35,7 @@ A code-first portfolio site that auto-generates itself from a single LaTeX résu
 | Styling | Raw CSS modules in `globals.css` (dark-first, no Tailwind utilities) |
 | Linting | ESLint 10 + `@typescript-eslint`, commitlint, husky |
 
----
+
 
 ## Using this for your own portfolio
 
@@ -144,7 +144,7 @@ The API route `GET /api/resume` reads `src/data/resume.sty` at runtime and retur
 | Section order | `src/app/page.tsx` |
 | Fonts | `globals.css` `:root` / `html` block |
 
----
+
 
 ## Project structure
 
@@ -171,7 +171,7 @@ src/
     └── resume.types.ts       # TypeScript types for the parsed Resume
 ```
 
----
+
 
 ## Scripts
 
@@ -182,7 +182,7 @@ yarn lint         # ESLint
 yarn lint:sarif   # ESLint → SARIF (for SonarQube / GitHub Code Scanning)
 ```
 
----
+
 
 ## Roadmap / next steps
 
@@ -201,7 +201,7 @@ Contributions and ideas welcome. Rough priority order:
 - [ ] **Accessibility audit** — Automated axe-core checks in CI and a keyboard-navigation pass on all interactive elements
 - [ ] **Performance** — `next/image` for any photos, font subsetting, bundle analysis with `@next/bundle-analyzer`
 
----
+
 
 ## Contributing
 
@@ -209,7 +209,7 @@ Contributions and ideas welcome. Rough priority order:
 2. Commit using conventional commits: `feat:`, `fix:`, `chore:` (enforced by commitlint + husky)
 3. Open a pull request against `main`
 
----
+
 
 ## License
 
