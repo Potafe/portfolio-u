@@ -149,6 +149,8 @@ function parseContact(src: string): ContactInfo {
   const nameMatch = /\\scshape\s([^\\]*)\\\\/.exec(block);
   const name = nameMatch
     ? cleanLatex((nameMatch[1] ?? "").trimEnd())
+        .replaceAll(/\}+$/g, "")
+        .trim()
     : "Unknown";
 
   // Phone: \href{tel:...}{label}
@@ -408,7 +410,7 @@ function parseSkills(block: string): SkillsSection {
     if (!cat || !skillsRaw) continue;
     const category = cat.trim();
     const skills = skillsRaw
-      .replaceAll(/^:\s*/, "")
+      .replace(/^:\s*/, "")
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);

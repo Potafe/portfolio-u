@@ -98,7 +98,6 @@
         \resumeItem{Conducted \textbf{cloud security assessments} for multiple teams at Philips Innovation Campus, enabling adoption of CSPM best practices and strengthening \textbf{Infrastructure-as-Code (IaC)} and application code security.}
         \resumeItem{Designed and developed an internal tool, \textbf{SBOMGen}, to automate the generation of \textbf{Software Bill of Materials (SBOMs)} from source code repositories and build artifacts.}
         \resumeItem{Built a \textbf{Python library and GitHub Action} to automate SBOM import, upload, and VEX processing, significantly reducing manual effort and turnaround time previously required through the Cybeats UI.}
-        \resumeItem{Improved internal \textbf{SBOM management system} (Python/Django) with better imports, editing, summaries, and lifecycle tracking.}
         \resumeItem{Automated \textbf{risk assessments} in DefectDojo via OWASP methods; cut manual review by 40\% using LLMs.}
         \resumeItem{Built an \textbf{AI-based threat modeling pipeline} using CVSS, EPSS, KEV for prioritization.}
         \resumeItem{Managed enterprise tools: \textbf{Fortify, AquaSec, GHAS, Cybeats}.}
@@ -108,9 +107,10 @@
       {Apprentice Software Developer}{Jan 2025 – Aug 2025}
       {Philips Innovation Campus}{Bengaluru, India}
       \resumeItemListStart
-        \resumeItem{Enhanced the internal SBOM editor by implementing features for improved import, editing, and summary generation.}
+        \resumeItem{\textbf{Achievement: PPO}}
+        \resumeItem{Improved internal \textbf{SBOM management system} (Python/Django) with better imports, editing, summaries, and lifecycle tracking.}
         \resumeItem{Streamlined risk assessment by automating processes with OWASP methodology and integrating an LLM to reduce manual effort.}
-        \resumeItem{Developed a threat analysis model using CVSS, EPSS, and KEV to prioritize and contextualize security risks.}
+        \resumeItem{Led validation of third-party tools, ensuring alignment with \textbf{QMS standards} and improving reliability and compliance across development workflows.}
       \resumeItemListEnd
 
   \resumeSubheading
@@ -126,6 +126,14 @@
 \newcommand{\projectlink}[1]{\href{#1}{\includegraphics[height=0.8em]{github-icon.png}}}
 \section{Projects}
   \resumeSubHeadingListStart
+    \resumeProjectHeading
+      {\textbf{spdxmerge} \projectlink{https://github.com/philips-software/spdxmerge} $|$ \footnotesize\emph{Python, SPDX, Docker, GitHub Actions, pylint}}{{Feb 2025 - Apr 2025}}
+      \resumeItemListStart
+        \resumeItem{Contributed \textbf{15+ merged PRs} to the Philips open-source \textbf{spdxmerge} tool — a Python/Docker utility for merging SPDX Software Bill of Materials (SBOMs).}
+        \resumeItem{Resolved critical bugs across Docker entrypoint, SHA validation, file-path handling, and output generation; refactored dependency to \textbf{spdx-tools==0.8.3} for improved compatibility.}
+        \resumeItem{Added \texttt{rootdocpath} Docker input support, fixed CI/CD test workflows, and improved README documentation for open-source contributors.}
+      \resumeItemListEnd
+
     \resumeProjectHeading
       {\textbf{PDF AnswerBot} \projectlink{https://github.com/Potafe/RAG_Ollama} $|$ \footnotesize\emph{Docker, Neo4j, LangChain, Python, Streamlit, Ollama}}{{July 2024 - Ongoing}}
       \resumeItemListStart

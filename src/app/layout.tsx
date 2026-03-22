@@ -1,5 +1,7 @@
 import "../styles/globals.css";
 import type { ReactNode } from "react";
+import SmoothScroll from "@/components/ui/SmoothScroll";
+import Navbar from "@/components/ui/Navbar";
 
 export default function RootLayout({
   children,
@@ -8,7 +10,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <SmoothScroll>
+          <Navbar />
+          {children}
+        </SmoothScroll>
+      </body>
     </html>
   );
 }
