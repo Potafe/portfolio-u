@@ -148,9 +148,13 @@ function parseContact(src: string): ContactInfo {
   // Name: \textbf{\Huge \scshape Name Name}
   const nameMatch = /\\scshape\s([^\\]*)\\\\/.exec(block);
   const name = nameMatch
-    ? cleanLatex((nameMatch[1] ?? "").trimEnd())
-        .replaceAll(/\}+$/g, "")
-        .trim()
+    ? (() => {
+        let s = cleanLatex((nameMatch[1] ?? "").trimEnd());
+        // Strip trailing } characters without a regex to avoid any
+        // super-linear backtracking flagged by static analysis tools.
+        while (s.endsWith("}")) s = s.slice(0, -1);
+        return s.trim();
+      })()
     : "Unknown";
 
   // Phone: \href{tel:...}{label}

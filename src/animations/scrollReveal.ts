@@ -108,7 +108,7 @@ export function scrambleReveal(
           .split("")
           .map((ch, i) => {
             if (i < iteration) return original[i] ?? ch;
-            return CHARS[Math.floor(Math.random() * CHARS.length)] ?? ch;
+            return CHARS[Math.floor(Math.random() * CHARS.length)] ?? ch; // NOSONAR(javascript:S2245) – not security-sensitive; used only for visual text-scramble animation
           })
           .join("");
         if (iteration >= original.length) {
