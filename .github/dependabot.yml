@@ -9,18 +9,50 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      # All patch updates together, may be merged when CI is green.
+      patch-updates:
+        update-types: [ "patch" ]
+
+      # All minor updates together. Requires green CI + manual check.
+      minor-updates:
+        update-types: [ "minor" ]
 
   - package-ecosystem: "docker" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      # All patch updates together, may be merged when CI is green.
+      patch-updates:
+        update-types: [ "patch" ]
+
+      # All minor updates together. Requires green CI + manual check.
+      minor-updates:
+        update-types: [ "minor" ]
 
   - package-ecosystem: "docker-compose" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      # All patch updates together, may be merged when CI is green.
+      patch-updates:
+        update-types: [ "patch" ]
+
+      # All minor updates together. Requires green CI + manual check.
+      minor-updates:
+        update-types: [ "minor" ]
 
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      # All patch updates together, may be merged when CI is green.
+      patch-updates:
+        update-types: [ "patch" ]
+
+      # All minor updates together. Requires green CI + manual check.
+      minor-updates:
+        update-types: [ "minor" ]

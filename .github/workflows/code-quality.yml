@@ -1,0 +1,42 @@
+name: "Code Quality"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    permissions:
+      # required to upload SARIF results to Code Scanning
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+    - name: Setup Node
+      uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+      with:
+        node-version: '24'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+
+    - name: Run ESLint (SARIF)
+      # continue-on-error so the upload step always runs even when lint finds issues
+      run: npm run lint:sarif
+      continue-on-error: true
+
+    - name: Upload SARIF results to Code Scanning
+      uses: github/codeql-action/upload-sarif@38697555549f1db7851b81482ff19f1fa5c4fedc # v4.34.1
+      with:
+        sarif_file: eslint-results.sarif
+        category: eslint
+        wait-for-processing: true

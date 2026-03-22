@@ -4,7 +4,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   font-family: system-ui, sans-serif;
   background: #0f0f0f;
   color: white;
