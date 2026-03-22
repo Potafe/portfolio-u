@@ -216,12 +216,36 @@ function parseGpaFromExtra(
 ): EducationEntry["gpa"] | undefined {
   if (!extra) return undefined;
 
-  // Match "N.NN/N.NN" or "GPA: N.NN/N.NN" — tolerates any surrounding text
-  const m = /(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/.exec(extra);
-  if (!m) return undefined;
+  // Linear string scan — no regex to avoid backtracking risk.
+  // Strategy: find "/", then walk backwards for value, forwards for scale.
+  const slashIdx = extra.indexOf("/");
+  if (slashIdx === -1) return undefined;
 
-  const valueStr = m[1]!;
-  const scaleStr = m[2]!;
+  // Walk backwards from slash to find the preceding decimal number
+  let lo = slashIdx - 1;
+  while (
+    lo >= 0 &&
+    (extra[lo] === "." || (extra[lo]! >= "0" && extra[lo]! <= "9"))
+  )
+    lo--;
+  const valueStr = extra.slice(lo + 1, slashIdx).trim();
+
+  // Walk forwards from slash to find the following decimal number
+  let hi = slashIdx + 1;
+  while (
+    hi < extra.length &&
+    (extra[hi] === "." || (extra[hi]! >= "0" && extra[hi]! <= "9"))
+  )
+    hi++;
+  const scaleStr = extra.slice(slashIdx + 1, hi).trim();
+
+  if (
+    valueStr === "" ||
+    scaleStr === "" ||
+    Number.isNaN(Number(valueStr)) ||
+    Number.isNaN(Number(scaleStr))
+  )
+    return undefined;
 
   return {
     value: Number.parseFloat(valueStr),

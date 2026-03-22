@@ -114,7 +114,6 @@ export async function POST(request: Request) {
     });
 
     if (!res.ok) {
-      // console.error("Resend error:", await res.text());
       return NextResponse.json(
         { error: "Failed to send message. Please try again later." },
         { status: 502 },
@@ -128,11 +127,6 @@ export async function POST(request: Request) {
   // No email backend configured — log the message server-side and acknowledge.
   // In production, set RESEND_API_KEY + CONTACT_TO_EMAIL to enable delivery.
 
-  // console.log("[contact]", {
-  //   name: name.trim(),
-  //   email: email.trim(),
-  //   message: message.trim(),
-  // });
   // Still mark as sent so the daily limit is enforced even without email delivery.
   markSentToday(ip);
   return NextResponse.json({ ok: true });
