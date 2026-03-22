@@ -28,32 +28,19 @@ jobs:
       matrix:
         include:
         - language: javascript-typescript
-          build-mode: manual
+          build-mode: none
         - language: actions
-          build-mode: autobuild
+          build-mode: none
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-    
-    # Setup Node for project build
-    - name: Setup Node
-      uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-      with:
-        node-version: '24'
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@38697555549f1db7851b81482ff19f1fa5c4fedc # v4.34.1
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
-    
-    # Build setup for TypeScript
-    - if: ${{ matrix.build-mode == 'manual' }}
-      name: Build TypeScript Repo
-      run: |
-        npm ci
-        npm run build
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@38697555549f1db7851b81482ff19f1fa5c4fedc # v4.34.1
