@@ -173,7 +173,8 @@ function parseContact(src: string): ContactInfo {
     const icon = m[1];
     const url = m[2];
     const label = m[3];
-    if (icon && url && label) {
+    // Skip tel: links — those are captured separately as contact.phone
+    if (icon && url && label && !url.startsWith("tel:")) {
       links.push({ label, url, icon });
     }
   }
@@ -215,15 +216,36 @@ function parseGpaFromExtra(
 ): EducationEntry["gpa"] | undefined {
   if (!extra) return undefined;
 
-  const parts = extra.split("/");
-  if (parts.length !== 2) return undefined;
+  // Linear string scan — no regex to avoid backtracking risk.
+  // Strategy: find "/", then walk backwards for value, forwards for scale.
+  const slashIdx = extra.indexOf("/");
+  if (slashIdx === -1) return undefined;
 
-  const valueStr = (parts[0] ?? "").trim();
-  const scaleStr = (parts[1] ?? "").trim();
+  // Walk backwards from slash to find the preceding decimal number
+  let lo = slashIdx - 1;
+  while (
+    lo >= 0 &&
+    (extra[lo] === "." || (extra[lo]! >= "0" && extra[lo]! <= "9"))
+  )
+    lo--;
+  const valueStr = extra.slice(lo + 1, slashIdx).trim();
 
-  const isValid = (s: string) => /^\d+(\.\d+)?$/.test(s);
+  // Walk forwards from slash to find the following decimal number
+  let hi = slashIdx + 1;
+  while (
+    hi < extra.length &&
+    (extra[hi] === "." || (extra[hi]! >= "0" && extra[hi]! <= "9"))
+  )
+    hi++;
+  const scaleStr = extra.slice(slashIdx + 1, hi).trim();
 
-  if (!isValid(valueStr) || !isValid(scaleStr)) return undefined;
+  if (
+    valueStr === "" ||
+    scaleStr === "" ||
+    Number.isNaN(Number(valueStr)) ||
+    Number.isNaN(Number(scaleStr))
+  )
+    return undefined;
 
   return {
     value: Number.parseFloat(valueStr),

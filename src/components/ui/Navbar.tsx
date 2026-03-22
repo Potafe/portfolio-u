@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
+import ThemeSwitcher from "@/components/ui/ThemeSwitcher";
 
 const NAV_LINKS = [
-  { label: "About", href: "#about" },
-  { label: "Experience", href: "#experience" },
-  { label: "Projects", href: "#projects" },
-  { label: "Beyond", href: "#extracurriculars" },
+  { label: "About", num: "01", href: "#about" },
+  { label: "Experience", num: "02", href: "#experience" },
+  { label: "Projects", num: "03", href: "#projects" },
+  { label: "Beyond", num: "04", href: "#extracurriculars" },
+  { label: "Contact", num: "05", href: "#contact" },
 ];
 
 export default function Navbar() {
@@ -78,17 +80,16 @@ export default function Navbar() {
       >
         <div className="navbar-inner">
           {/* Logo */}
-          <a
-            href="#"
+          <button
+            type="button"
             className="navbar-logo"
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={() => {
               globalThis.window?.scrollTo({ top: 0, behavior: "smooth" });
             }}
             aria-label="Back to top"
           >
             {"<YM />"}
-          </a>
+          </button>
 
           {/* Desktop links */}
           <ul className="navbar-links">
@@ -99,11 +100,12 @@ export default function Navbar() {
                   onClick={() => handleNavClick(link.href)}
                   type="button"
                 >
+                  <span className="navbar-link-num">{link.num}</span>
                   {link.label}
                   {active === link.href && (
                     <motion.span
-                      className="navbar-link-dot"
-                      layoutId="nav-dot"
+                      className="navbar-link-bar"
+                      layoutId="nav-bar"
                       transition={{
                         type: "spring",
                         stiffness: 380,
@@ -115,6 +117,9 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
+
+          {/* Theme toggle */}
+          <ThemeSwitcher />
 
           {/* Hamburger */}
           <button
@@ -166,7 +171,7 @@ export default function Navbar() {
                     className={`drawer-link${active === link.href ? " drawer-link--active" : ""}`}
                     onClick={() => handleNavClick(link.href)}
                   >
-                    <span className="drawer-link-num">0{i + 1}</span>
+                    <span className="drawer-link-num">{link.num}</span>
                     {link.label}
                   </button>
                 </motion.li>
