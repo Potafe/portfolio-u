@@ -143,13 +143,23 @@ export default function Contact() {
           </div>
 
           {status === "success" && (
-            <p className="contact-status contact-status--success">
+            <p
+              className="contact-status contact-status--success"
+              role="status"
+              aria-live="polite"
+            >
               ✓ Message sent! I will be in touch soon.
             </p>
           )}
 
           {status === "error" && (
-            <p className="contact-status contact-status--error">✕ {errorMsg}</p>
+            <p
+              className="contact-status contact-status--error"
+              role="status"
+              aria-live="assertive"
+            >
+              ✕ {errorMsg}
+            </p>
           )}
 
           <div className="contact-actions">

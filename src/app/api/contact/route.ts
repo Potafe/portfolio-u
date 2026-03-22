@@ -42,6 +42,14 @@ function markSentToday(ip: string): void {
   sentToday.set(ip, todayUTC());
 }
 
+/** Remove entries from previous days to prevent unbounded map growth. */
+function purgeStaleEntries(): void {
+  const today = todayUTC();
+  for (const [ip, date] of sentToday) {
+    if (date !== today) sentToday.delete(ip);
+  }
+}
+
 export async function POST(request: Request) {
   // Rate-limit by IP
   const headersList = await headers();
@@ -49,6 +57,8 @@ export async function POST(request: Request) {
     headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     headersList.get("x-real-ip") ??
     "unknown";
+
+  purgeStaleEntries();
 
   if (hasAlreadySentToday(ip)) {
     return NextResponse.json(

@@ -257,8 +257,8 @@ export default function ResumePDFPages({ resume }: Readonly<Props>) {
                 </View>
               </View>
               <View style={styles.bulletList}>
-                {exp.bullets.map((b) => (
-                  <Bullet key={b.slice(0, 50)} text={b} />
+                {exp.bullets.map((b, bi) => (
+                  <Bullet key={`${bi}-${b.slice(0, 20)}`} text={b} />
                 ))}
               </View>
             </View>
@@ -310,8 +310,8 @@ export default function ResumePDFPages({ resume }: Readonly<Props>) {
                 </Text>
               </View>
               <View style={styles.bulletList}>
-                {proj.bullets.map((b) => (
-                  <Bullet key={b.slice(0, 50)} text={b} />
+                {proj.bullets.map((b, bi) => (
+                  <Bullet key={`${bi}-${b.slice(0, 20)}`} text={b} />
                 ))}
               </View>
             </View>
@@ -359,8 +359,8 @@ export default function ResumePDFPages({ resume }: Readonly<Props>) {
               </View>
               {act.bullets.length > 0 && (
                 <View style={styles.bulletList}>
-                  {act.bullets.map((b) => (
-                    <Bullet key={b.slice(0, 50)} text={b} />
+                  {act.bullets.map((b, bi) => (
+                    <Bullet key={`${bi}-${b.slice(0, 20)}`} text={b} />
                   ))}
                 </View>
               )}
