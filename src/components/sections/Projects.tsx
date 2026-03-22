@@ -65,7 +65,9 @@ function useMagneticTilt() {
   const magnetY = useMotionValue(0);
   const springX = useSpring(magnetX, { stiffness: 180, damping: 22 });
   const springY = useSpring(magnetY, { stiffness: 180, damping: 22 });
-  const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
+  // Use a ref instead of state so tilt updates bypass the React render cycle,
+  // avoiding a re-render on every mousemove event.
+  const tiltRef = useRef<HTMLDivElement | null>(null);
 
   const onMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -77,10 +79,10 @@ function useMagneticTilt() {
 
       const px = (e.clientX - r.left) / r.width - 0.5;
       const py = (e.clientY - r.top) / r.height - 0.5;
-      setTiltStyle({
-        transform: `perspective(800px) rotateY(${px * 12}deg) rotateX(${-py * 9}deg) translateY(-6px)`,
-        transition: "transform 0.1s ease-out",
-      });
+      if (tiltRef.current) {
+        tiltRef.current.style.transform = `perspective(800px) rotateY(${px * 12}deg) rotateX(${-py * 9}deg) translateY(-6px)`;
+        tiltRef.current.style.transition = "transform 0.1s ease-out";
+      }
 
       // Drive spotlight glow with cursor position
       e.currentTarget.style.setProperty(
@@ -98,14 +100,14 @@ function useMagneticTilt() {
   const onMouseLeave = useCallback(() => {
     magnetX.set(0);
     magnetY.set(0);
-    setTiltStyle({
-      transform:
-        "perspective(800px) rotateY(0deg) rotateX(0deg) translateY(0px)",
-      transition: "transform 0.5s ease-out",
-    });
+    if (tiltRef.current) {
+      tiltRef.current.style.transform =
+        "perspective(800px) rotateY(0deg) rotateX(0deg) translateY(0px)";
+      tiltRef.current.style.transition = "transform 0.5s ease-out";
+    }
   }, [magnetX, magnetY]);
 
-  return { springX, springY, tiltStyle, onMouseMove, onMouseLeave };
+  return { springX, springY, tiltRef, onMouseMove, onMouseLeave };
 }
 
 // ─── Project Card ──────────────────────────────────────────────────────────
@@ -127,7 +129,7 @@ function ProjectCard({
 }: Readonly<CardProps>) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const hasEntered = useInView(wrapperRef, { once: true, amount: 0.15 });
-  const { springX, springY, tiltStyle, onMouseMove, onMouseLeave } =
+  const { springX, springY, tiltRef, onMouseMove, onMouseLeave } =
     useMagneticTilt();
 
   return (
@@ -160,14 +162,17 @@ function ProjectCard({
           tabIndex={0}
           aria-label={`View case study for ${entry.title}`}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") onSelect();
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault(); // Space would otherwise scroll the page
+              onSelect();
+            }
           }}
         >
           {/* Spotlight glow overlay (not in tilt space, tracks cursor) */}
           <div className="proj-glow" aria-hidden />
 
           {/* 3D tilt layer */}
-          <div style={tiltStyle} className="proj-card-body">
+          <div ref={tiltRef} className="proj-card-body">
             {/* Header row */}
             <div className="proj-card-top">
               <div className="proj-title-group">

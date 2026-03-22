@@ -12,6 +12,7 @@ import type { Resume } from "@/types/resume.types";
 
 export default function Home() {
   const [resume, setResume] = useState<Resume | null>(null);
+  const [fetchError, setFetchError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showHero, setShowHero] = useState(false);
 
@@ -19,9 +20,7 @@ export default function Home() {
     fetch("/api/resume")
       .then((r) => r.json())
       .then((data: Resume) => setResume(data))
-      .catch(() => {
-        /* resume fetch failed silently */
-      });
+      .catch(() => setFetchError(true));
   }, []);
 
   const handleLoadingComplete = () => {
@@ -36,6 +35,21 @@ export default function Home() {
           <LoadingScreen key="loader" onComplete={handleLoadingComplete} />
         )}
       </AnimatePresence>
+
+      {showHero && fetchError && !resume && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100vh",
+            color: "#888",
+            fontFamily: "monospace",
+          }}
+        >
+          Failed to load resume data — please refresh the page.
+        </div>
+      )}
 
       {showHero && resume && (
         <>

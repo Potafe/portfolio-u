@@ -537,7 +537,12 @@ export function buildSummaryStats(resume: Resume): ResumeSummaryStats {
   const allStarts = resume.experience.map((e) =>
     new Date(e.period.start).getFullYear(),
   );
-  const earliest = Math.min(...allStarts.filter((y) => !Number.isNaN(y)));
+  const validStarts = allStarts.filter((y) => !Number.isNaN(y));
+  // Guard against empty array: Math.min(...[]) returns Infinity.
+  const earliest =
+    validStarts.length > 0
+      ? Math.min(...validStarts)
+      : new Date().getFullYear();
   const yearsOfExperience = new Date().getFullYear() - earliest;
 
   const companies = new Set(resume.experience.map((e) => e.company));

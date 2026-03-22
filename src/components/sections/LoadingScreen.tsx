@@ -31,19 +31,24 @@ function TypingLine({
 
   useEffect(() => {
     let i = 0;
+    // Declare intervalId in the outer scope so the effect cleanup can always
+    // reach it, even if the component unmounts before the setTimeout fires.
+    let intervalId: ReturnType<typeof setInterval>;
     const timer = setTimeout(() => {
-      const interval = setInterval(() => {
+      intervalId = setInterval(() => {
         i++;
         setDisplayed(text.slice(0, i));
         if (i >= text.length) {
-          clearInterval(interval);
+          clearInterval(intervalId);
           setDone(true);
           onDone?.();
         }
       }, 22);
-      return () => clearInterval(interval);
     }, delay);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(intervalId);
+    };
   }, [text, delay, onDone]);
 
   return (
@@ -69,7 +74,10 @@ export default function LoadingScreen({ onComplete }: Readonly<Props>) {
   const advanceStep = () => {
     setVisibleCount((c) => {
       const next = c + 1;
-      progressRef.current = Math.round((next / totalSteps) * 100);
+      progressRef.current = Math.min(
+        100,
+        Math.round((next / totalSteps) * 100),
+      );
       setProgress(progressRef.current);
       if (next > totalSteps) {
         setTimeout(onComplete, 520);

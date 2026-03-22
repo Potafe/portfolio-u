@@ -23,8 +23,10 @@ export function useGsapContext(
   deps: React.DependencyList = [],
 ): void {
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      factory(ctx);
+    // Pass `self` (the context object) via the callback parameter so it is
+    // available before the outer `const ctx` assignment completes.
+    const ctx = gsap.context((self) => {
+      factory(self);
     });
     return () => ctx.revert();
   }, deps);

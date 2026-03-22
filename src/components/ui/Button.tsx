@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useMagnetic } from "@/hooks/useGsap";
 import clsx from "clsx";
@@ -8,12 +9,12 @@ import clsx from "clsx";
 export type ButtonVariant = "primary" | "ghost" | "outline";
 export type ButtonSize = "sm" | "md" | "lg";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   magnetic?: boolean;
   loading?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const SIZE_CLASS: Record<ButtonSize, string> = {
@@ -58,7 +59,7 @@ const ButtonInner = forwardRef<
           VARIANT_CLASS[variant],
           className,
         )}
-        disabled={loading ?? htmlProps.disabled}
+        disabled={loading === true || htmlProps.disabled === true}
         {...(style ? { style } : {})}
         {...htmlProps}
       >
