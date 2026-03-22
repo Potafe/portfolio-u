@@ -21,8 +21,7 @@ export default function Contact() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setStatus("sending");
     setErrorMsg("");
 
@@ -53,16 +52,16 @@ export default function Contact() {
   return (
     <section id="contact" className="contact-root">
       <div className="contact-inner">
-        <motion.p
-          className="contact-label"
+        <motion.span
+          className="contact-eyebrow"
           variants={slideUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           custom={0}
         >
-          Get in touch
-        </motion.p>
+          05 / Contact
+        </motion.span>
 
         <motion.h2
           className="contact-heading"
@@ -89,7 +88,10 @@ export default function Contact() {
 
         <motion.form
           className="contact-form"
-          onSubmit={(e) => void handleSubmit(e)}
+          onSubmit={(e) => {
+            e.preventDefault();
+            void handleSubmit();
+          }}
           variants={slideUp}
           initial="hidden"
           whileInView="visible"
@@ -97,32 +99,34 @@ export default function Contact() {
           custom={0.3}
           noValidate
         >
-          <div className="contact-field">
-            <label htmlFor="contact-name">Name</label>
-            <input
-              id="contact-name"
-              type="text"
-              className="contact-input"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              disabled={status === "sending"}
-            />
-          </div>
+          <div className="contact-row">
+            <div className="contact-field">
+              <label htmlFor="contact-name">Name</label>
+              <input
+                id="contact-name"
+                type="text"
+                className="contact-input"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                disabled={status === "sending"}
+              />
+            </div>
 
-          <div className="contact-field">
-            <label htmlFor="contact-email">Email</label>
-            <input
-              id="contact-email"
-              type="email"
-              className="contact-input"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={status === "sending"}
-            />
+            <div className="contact-field">
+              <label htmlFor="contact-email">Email</label>
+              <input
+                id="contact-email"
+                type="email"
+                className="contact-input"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={status === "sending"}
+              />
+            </div>
           </div>
 
           <div className="contact-field">
@@ -140,21 +144,30 @@ export default function Contact() {
 
           {status === "success" && (
             <p className="contact-status contact-status--success">
-              Message sent! I will be in touch soon.
+              ✓ Message sent! I will be in touch soon.
             </p>
           )}
 
           {status === "error" && (
-            <p className="contact-status contact-status--error">{errorMsg}</p>
+            <p className="contact-status contact-status--error">✕ {errorMsg}</p>
           )}
 
-          <button
-            type="submit"
-            className="contact-submit"
-            disabled={status === "sending"}
-          >
-            {status === "sending" ? "Sending..." : "Send message"}
-          </button>
+          <div className="contact-actions">
+            <button
+              type="submit"
+              className="contact-submit"
+              disabled={status === "sending" || status === "success"}
+            >
+              {status === "sending" ? (
+                <>
+                  <span className="contact-spinner" aria-hidden="true" />{" "}
+                  Sending…
+                </>
+              ) : (
+                "Send message →"
+              )}
+            </button>
+          </div>
         </motion.form>
       </div>
     </section>

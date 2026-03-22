@@ -173,7 +173,8 @@ function parseContact(src: string): ContactInfo {
     const icon = m[1];
     const url = m[2];
     const label = m[3];
-    if (icon && url && label) {
+    // Skip tel: links — those are captured separately as contact.phone
+    if (icon && url && label && !url.startsWith("tel:")) {
       links.push({ label, url, icon });
     }
   }
@@ -215,15 +216,12 @@ function parseGpaFromExtra(
 ): EducationEntry["gpa"] | undefined {
   if (!extra) return undefined;
 
-  const parts = extra.split("/");
-  if (parts.length !== 2) return undefined;
+  // Match "N.NN/N.NN" or "GPA: N.NN/N.NN" — tolerates any surrounding text
+  const m = /(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/.exec(extra);
+  if (!m) return undefined;
 
-  const valueStr = (parts[0] ?? "").trim();
-  const scaleStr = (parts[1] ?? "").trim();
-
-  const isValid = (s: string) => /^\d+(\.\d+)?$/.test(s);
-
-  if (!isValid(valueStr) || !isValid(scaleStr)) return undefined;
+  const valueStr = m[1]!;
+  const scaleStr = m[2]!;
 
   return {
     value: Number.parseFloat(valueStr),

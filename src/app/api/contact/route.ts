@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 
 interface ContactPayload {
   name: string;
@@ -6,11 +7,59 @@ interface ContactPayload {
   message: string;
 }
 
+// Linear-time email validation — avoids ReDoS from adjacent quantifiers.
+// RFC 5321 limits: 254 chars total, 64 for the local part.
 function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (email.length > 254) return false;
+  const atIdx = email.indexOf("@");
+  // Must have exactly one @, not at position 0
+  if (atIdx < 1 || atIdx !== email.lastIndexOf("@")) return false;
+  const local = email.slice(0, atIdx);
+  const domain = email.slice(atIdx + 1);
+  if (local.length > 64 || domain.length < 4) return false;
+  // No whitespace anywhere; domain must contain at least one dot
+  return !/\s/.test(email) && domain.includes(".");
+}
+
+// ─── Simple in-process rate limiter ───────────────────────────────────────
+// Limits each IP to 1 successful send per calendar day (UTC).
+// Note: this state is per-instance; for multi-region deployments use an
+// external store (Redis / Upstash) instead.
+const sentToday = new Map<string, number>(); // ip → UTC date number (YYYYMMDD)
+
+function todayUTC(): number {
+  const d = new Date();
+  return (
+    d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate()
+  );
+}
+
+function hasAlreadySentToday(ip: string): boolean {
+  return sentToday.get(ip) === todayUTC();
+}
+
+function markSentToday(ip: string): void {
+  sentToday.set(ip, todayUTC());
 }
 
 export async function POST(request: Request) {
+  // Rate-limit by IP
+  const headersList = await headers();
+  const ip =
+    headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    headersList.get("x-real-ip") ??
+    "unknown";
+
+  if (hasAlreadySentToday(ip)) {
+    return NextResponse.json(
+      {
+        error:
+          "You have already sent a message today. Please try again tomorrow.",
+      },
+      { status: 429 },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -65,24 +114,26 @@ export async function POST(request: Request) {
     });
 
     if (!res.ok) {
-      // eslint-disable-next-line no-console
-      console.error("Resend error:", await res.text());
+      // console.error("Resend error:", await res.text());
       return NextResponse.json(
         { error: "Failed to send message. Please try again later." },
         { status: 502 },
       );
     }
 
+    markSentToday(ip);
     return NextResponse.json({ ok: true });
   }
 
   // No email backend configured — log the message server-side and acknowledge.
   // In production, set RESEND_API_KEY + CONTACT_TO_EMAIL to enable delivery.
-  // eslint-disable-next-line no-console
-  console.log("[contact]", {
-    name: name.trim(),
-    email: email.trim(),
-    message: message.trim(),
-  });
+
+  // console.log("[contact]", {
+  //   name: name.trim(),
+  //   email: email.trim(),
+  //   message: message.trim(),
+  // });
+  // Still mark as sent so the daily limit is enforced even without email delivery.
+  markSentToday(ip);
   return NextResponse.json({ ok: true });
 }

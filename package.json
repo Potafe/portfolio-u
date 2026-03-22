@@ -19,7 +19,10 @@
     "typescript-eslint": "^8.57.1"
   },
   "dependencies": {
+    "@expo-google-fonts/tinos": "^0.4.1",
+    "@fontsource/tinos": "^5.2.7",
     "@gsap/react": "^2.1.2",
+    "@react-pdf/renderer": "^4.3.2",
     "@studio-freight/react-lenis": "^0.0.47",
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.1",

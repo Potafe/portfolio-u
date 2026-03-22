@@ -28,11 +28,15 @@ function TypingLine({
 }>) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
+  // Use a ref so changing onDone (new function reference each render)
+  // never re-triggers the typing effect.
+  const onDoneRef = useRef(onDone);
+  useEffect(() => {
+    onDoneRef.current = onDone;
+  });
 
   useEffect(() => {
     let i = 0;
-    // Declare intervalId in the outer scope so the effect cleanup can always
-    // reach it, even if the component unmounts before the setTimeout fires.
     let intervalId: ReturnType<typeof setInterval>;
     const timer = setTimeout(() => {
       intervalId = setInterval(() => {
@@ -41,7 +45,7 @@ function TypingLine({
         if (i >= text.length) {
           clearInterval(intervalId);
           setDone(true);
-          onDone?.();
+          onDoneRef.current?.();
         }
       }, 22);
     }, delay);
@@ -49,7 +53,8 @@ function TypingLine({
       clearTimeout(timer);
       clearInterval(intervalId);
     };
-  }, [text, delay, onDone]);
+    // onDone intentionally excluded — kept current via ref above
+  }, [text, delay]);
 
   return (
     <div className="loading-line">

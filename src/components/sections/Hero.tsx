@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import type { Resume } from "@/types/resume.types";
 
@@ -44,21 +44,22 @@ const fadeIn: Variants = {
 function useTypingEffect(words: string[], startDelay = 0) {
   const [displayed, setDisplayed] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
-  const [phase, setPhase] = useState<"typing" | "pausing" | "deleting">(
-    "typing",
+  // null = not yet started; avoids the race where phase==="typing" on mount
+  // means the second effect fires immediately (started===false, returns) and
+  // the start-delay callback then calls setPhase("typing") with no state
+  // change, so React never re-runs the effect and typing never begins.
+  const [phase, setPhase] = useState<"typing" | "pausing" | "deleting" | null>(
+    null,
   );
-  const started = useRef(false);
 
+  // Kick off after the start delay
   useEffect(() => {
-    const delay = setTimeout(() => {
-      started.current = true;
-      setPhase("typing");
-    }, startDelay);
+    const delay = setTimeout(() => setPhase("typing"), startDelay);
     return () => clearTimeout(delay);
   }, [startDelay]);
 
   useEffect(() => {
-    if (!started.current) return;
+    if (phase === null) return;
     const word = words[wordIndex % words.length] ?? "";
 
     if (phase === "typing") {

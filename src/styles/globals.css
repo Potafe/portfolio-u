@@ -1634,14 +1634,18 @@ dialog.proj-modal-scroll::backdrop {
   font-family: "SF Mono", "Fira Code", monospace;
   font-size: 15px;
   font-weight: 700;
-  color: #c4b5fd;
+  color: #7c3aed;
   text-decoration: none;
-  letter-spacing: -0.02em;
-  transition: color 0.15s ease;
+  letter-spacing: -0.03em;
+  transition: opacity 0.15s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 
 .navbar-logo:hover {
-  color: #a78bfa;
+  opacity: 0.7;
 }
 
 .navbar-links {
@@ -1653,38 +1657,55 @@ dialog.proj-modal-scroll::backdrop {
 
 .navbar-link {
   position: relative;
-  padding: 7px 14px;
-  font-size: 13.5px;
+  padding: 7px 12px;
+  font-size: 13px;
   font-weight: 500;
+  letter-spacing: 0.01em;
   color: var(--text-secondary);
   background: none;
   border: none;
   cursor: pointer;
   border-radius: 8px;
-  transition:
-    color 0.15s ease,
-    background 0.15s ease;
+  transition: color 0.15s ease;
   font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Numbered prefix shown on desktop nav links */
+.navbar-link-num {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent-1);
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
 }
 
 .navbar-link:hover {
   color: var(--text-primary);
-  background: var(--bg-surface);
+}
+
+.navbar-link:hover .navbar-link-num,
+.navbar-link--active .navbar-link-num {
+  opacity: 1;
 }
 
 .navbar-link--active {
-  color: #c4b5fd;
+  color: var(--text-primary);
 }
 
-.navbar-link-dot {
+/* Animated sliding bar under the active link */
+.navbar-link-bar {
   position: absolute;
   bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #7c3aed;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
 }
 
 /* Hamburger */
@@ -1802,36 +1823,41 @@ dialog.proj-modal-scroll::backdrop {
 .theme-switcher {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 5px;
+  padding: 5px 11px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background: transparent;
+  border-radius: 99px;
+  background: var(--bg-surface);
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 11px;
   font-family: "SF Mono", "Fira Code", monospace;
   cursor: pointer;
+  letter-spacing: 0.04em;
   transition:
-    color 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease;
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
   white-space: nowrap;
 }
 
 .theme-switcher:hover {
   color: var(--text-primary);
   border-color: var(--accent-1);
-  background: var(--bg-surface);
+  background: var(--bg-card);
 }
 
 .theme-switcher-icon {
-  font-size: 14px;
-  line-height: 1;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .theme-switcher-label {
-  font-size: 11px;
-  letter-spacing: 0.04em;
+  font-size: 10px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -1896,136 +1922,472 @@ dialog.proj-modal-scroll::backdrop {
 /* ─── Contact Section ────────────────────────────────────────────────────── */
 
 .contact-root {
-  padding: 100px 0 120px;
+  padding: 120px 24px;
   background: var(--bg-root);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle background orbs — mirrors Hero/About */
+.contact-root::before,
+.contact-root::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.contact-root::before {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #3b1f7530 0%, transparent 70%);
+  top: -80px;
+  right: -120px;
+}
+
+.contact-root::after {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, #1e3a5f28 0%, transparent 70%);
+  bottom: 0;
+  left: -80px;
 }
 
 .contact-inner {
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 0 24px;
+  position: relative;
+  z-index: 1;
 }
 
-.contact-label {
-  font-family: "SF Mono", "Fira Code", monospace;
+/* ── Header — matches section-eyebrow / section-title pattern ─────────── */
+
+.contact-eyebrow {
+  display: block;
   font-size: 11px;
-  letter-spacing: 0.16em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--accent-1);
-  margin-bottom: 16px;
+  color: #7c3aed;
+  margin-bottom: 14px;
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
 }
 
 .contact-heading {
-  font-size: clamp(28px, 5vw, 42px);
+  font-size: clamp(28px, 5vw, 46px);
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--text-primary);
+  line-height: 1.1;
   margin-bottom: 16px;
 }
 
 .contact-subtext {
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.75;
   color: var(--text-secondary);
-  margin-bottom: 40px;
+  margin-bottom: 48px;
+  max-width: 520px;
 }
+
+/* ── Form card — matches exp-card / proj-modal surface ───────────────── */
 
 .contact-form {
   display: flex;
   flex-direction: column;
+  gap: 20px;
+  background: #0e0e0e;
+  border: 1px solid #1f1f1f;
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+.contact-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+
+@media (max-width: 540px) {
+  .contact-row {
+    grid-template-columns: 1fr;
+  }
+  .contact-form {
+    padding: 24px;
+  }
 }
 
 .contact-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
 
 .contact-field label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: #555;
 }
 
 .contact-input,
 .contact-textarea {
   width: 100%;
   padding: 12px 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: #141414;
+  border: 1px solid #252525;
   border-radius: 10px;
-  color: var(--text-primary);
+  color: #e8e8e8;
   font-size: 14px;
   font-family: inherit;
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
   outline: none;
 }
 
 .contact-input::placeholder,
 .contact-textarea::placeholder {
-  color: var(--text-muted);
+  color: #3a3a3a;
 }
 
 .contact-input:focus,
 .contact-textarea:focus {
-  border-color: var(--accent-1);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  border-color: #7c3aed;
+  background: #0e0e0e;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
+}
+
+.contact-input:disabled,
+.contact-textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .contact-textarea {
-  min-height: 140px;
+  min-height: 130px;
   resize: vertical;
+  line-height: 1.6;
+}
+
+/* ── Actions row ──────────────────────────────────────────────────────── */
+
+.contact-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .contact-submit {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 13px 28px;
-  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #fff;
   font-size: 14px;
   font-weight: 600;
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 18px rgba(59, 31, 117, 0.4);
   transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-  align-self: flex-start;
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .contact-submit:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  opacity: 0.92;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(59, 31, 117, 0.55);
+}
+
+.contact-submit:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .contact-submit:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
+/* Spinner inside submit button */
+.contact-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ── Status banners ───────────────────────────────────────────────────── */
+
 .contact-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
+  line-height: 1.5;
 }
 
 .contact-status--success {
-  background: rgba(40, 200, 64, 0.12);
-  border: 1px solid rgba(40, 200, 64, 0.3);
-  color: #28c840;
+  background: #091a0d;
+  border: 1px solid #28c84033;
+  color: #4ade80;
 }
 
 .contact-status--error {
-  background: rgba(248, 113, 113, 0.12);
-  border: 1px solid rgba(248, 113, 113, 0.3);
+  background: #1a0909;
+  border: 1px solid #f8717133;
   color: #f87171;
+}
+
+/* ─── Light Mode Overrides ───────────────────────────────────────────────── */
+/* All hardcoded dark colours that don't respond to CSS variables */
+
+/* Hero: name gradient is white→lavender — readable on dark, invisible on light.
+   Must re-declare background-clip because the `background` shorthand resets it. */
+[data-theme="light"] .hero-name {
+  background: linear-gradient(
+    135deg,
+    #1e1b4b 0%,
+    #7c3aed 45%,
+    #2563eb 75%,
+    #0891b2 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Hero: grid lines are rgba(white) — invisible on light bg */
+[data-theme="light"] .hero-grid {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+}
+
+/* Hero: skill tags / links use hardcoded dark hover backgrounds */
+[data-theme="light"] .hero-skill-tag {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] .hero-skill-tag:hover {
+  color: #7c3aed;
+  border-color: rgba(124, 58, 237, 0.35);
+  background: #f3eeff;
+}
+[data-theme="light"] .hero-link {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] .hero-link:hover {
+  background: #f3eeff;
+  border-color: rgba(124, 58, 237, 0.45);
+  box-shadow: 0 0 24px rgba(124, 58, 237, 0.12);
+}
+
+/* Stat value gradient: must re-declare background-clip because `background`
+   shorthand resets it to border-box, causing the purple box to appear. */
+[data-theme="light"] .stat-value {
+  background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Edu badge: dark amber background */
+[data-theme="light"] .edu-badge {
+  background: #fffbeb;
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #b45309;
+}
+
+/* Experience section: hardcoded #060606 */
+[data-theme="light"] .exp-root {
+  background: var(--bg-surface);
+}
+[data-theme="light"] .exp-line-track {
+  background: #d0d0d0;
+}
+[data-theme="light"] .exp-dot {
+  background: #b8b8b8;
+}
+
+/* Badge variants: all hardcoded near-black backgrounds */
+[data-theme="light"] .type-fulltime {
+  background: #f0fdf4;
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #15803d;
+}
+[data-theme="light"] .type-internship {
+  background: #ecfeff;
+  border-color: rgba(6, 182, 212, 0.35);
+  color: #0e7490;
+}
+[data-theme="light"] .type-apprentice {
+  background: #fffbeb;
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #b45309;
+}
+[data-theme="light"] .type-contract {
+  background: #fef2f2;
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #b91c1c;
+}
+[data-theme="light"] .type-freelance {
+  background: #faf5ff;
+  border-color: rgba(167, 139, 250, 0.35);
+  color: #6d28d9;
+}
+
+/* Active nav links: light lavender #c4b5fd — washed out on white */
+[data-theme="light"] .navbar-link--active,
+[data-theme="light"] .drawer-link--active {
+  color: #6d28d9;
+}
+
+/* Extracurriculars section: hardcoded #060606 */
+[data-theme="light"] .extra-root {
+  background: var(--bg-surface);
+}
+[data-theme="light"] .extra-icon {
+  border-color: var(--border-color);
+}
+
+/* Project cards: hardcoded dark chip border */
+[data-theme="light"] .proj-chip {
+  border-color: var(--border-color);
+}
+[data-theme="light"] .proj-chip:hover {
+  color: #7c3aed;
+  border-color: rgba(124, 58, 237, 0.3);
+  background: #f3eeff;
+}
+
+/* GitHub link pill on card + modal */
+[data-theme="light"] .proj-gh {
+  background: #f3eeff;
+  border-color: rgba(124, 58, 237, 0.25);
+  color: #6d28d9;
+}
+[data-theme="light"] .proj-gh:hover {
+  background: #ede9ff;
+  border-color: rgba(124, 58, 237, 0.5);
+}
+[data-theme="light"] .proj-modal-gh {
+  background: #f3eeff;
+  border-color: rgba(124, 58, 237, 0.25);
+  color: #6d28d9;
+}
+[data-theme="light"] .proj-modal-gh:hover {
+  background: #ede9ff;
+  border-color: rgba(124, 58, 237, 0.5);
+}
+
+/* Modal: hardcoded dark border + heavy shadow */
+[data-theme="light"] .proj-modal {
+  border-color: var(--border-color);
+  box-shadow:
+    0 40px 120px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .proj-modal-close {
+  border-color: var(--border-color);
+}
+
+/* Story segments: near-black tinted backgrounds */
+[data-theme="light"] .story-seg--challenge {
+  background: #fef7f7;
+}
+[data-theme="light"] .story-seg--solution {
+  background: #f7f8fe;
+}
+[data-theme="light"] .story-seg--impact {
+  background: #f7fef8;
+}
+[data-theme="light"] .story-seg--challenge .story-label {
+  color: #b91c1c;
+}
+[data-theme="light"] .story-seg--solution .story-label {
+  color: #2563eb;
+}
+[data-theme="light"] .story-seg--impact .story-label {
+  color: #15803d;
+}
+
+/* Button ghost/outline: lavender text & dark hover bg */
+[data-theme="light"] .btn-ghost {
+  color: #6d28d9;
+}
+[data-theme="light"] .btn-ghost:hover:not(:disabled) {
+  background: #f3eeff;
+  border-color: rgba(124, 58, 237, 0.3);
+}
+[data-theme="light"] .btn-outline {
+  color: #6d28d9;
+  border-color: rgba(124, 58, 237, 0.4);
+}
+[data-theme="light"] .btn-outline:hover:not(:disabled) {
+  background: #f3eeff;
+  border-color: #7c3aed;
+}
+
+/* Loading card: white-ring shadow invisible on light */
+[data-theme="light"] .loading-card {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 24px 80px rgba(0, 0, 0, 0.12);
+}
+
+/* Contact form: all hardcoded dark colours */
+[data-theme="light"] .contact-form {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.04),
+    0 12px 48px rgba(0, 0, 0, 0.07);
+}
+[data-theme="light"] .contact-field label {
+  color: var(--text-secondary);
+}
+[data-theme="light"] .contact-input,
+[data-theme="light"] .contact-textarea {
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+[data-theme="light"] .contact-input::placeholder,
+[data-theme="light"] .contact-textarea::placeholder {
+  color: var(--text-muted);
+}
+[data-theme="light"] .contact-input:focus,
+[data-theme="light"] .contact-textarea:focus {
+  background: var(--bg-card);
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+[data-theme="light"] .contact-status--success {
+  background: #f0fdf4;
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #15803d;
+}
+[data-theme="light"] .contact-status--error {
+  background: #fef2f2;
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #b91c1c;
 }
