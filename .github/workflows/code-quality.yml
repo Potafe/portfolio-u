@@ -27,7 +27,7 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci --legacy-peer-deps
+      run: npm ci --legacy-peer-deps --ignore-scripts
 
     - name: Run ESLint (SARIF)
       # continue-on-error so the upload step always runs even when lint finds issues

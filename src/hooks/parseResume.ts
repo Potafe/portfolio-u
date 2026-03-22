@@ -31,25 +31,25 @@ import type {
 
 /** Strip outer braces from a LaTeX argument: {foo} → foo */
 function stripBraces(s: string): string {
-  return s.replace(/^\{|\}$/g, "").trim();
+  return s.replaceAll(/^\{|\}$/g, "").trim();
 }
 
 /** Remove common LaTeX markup and return clean plain text */
 function cleanLatex(s: string): string {
   return s
-    .replace(/\\textbf\{([^}]*)\}/g, "$1") // \textbf{x} → x
-    .replace(/\\textit\{([^}]*)\}/g, "$1") // \textit{x} → x
-    .replace(/\\emph\{([^}]*)\}/g, "$1") // \emph{x}   → x
-    .replace(/\\small\{([^}]*)\}/g, "$1")
-    .replace(/\\footnotesize\\emph\{([^}]*)\}/g, "$1")
-    .replace(/\\underline\{([^}]*)\}/g, "$1")
-    .replace(/\\href\{[^}]*\}\{([^}]*)\}/g, "$1") // \href{url}{label} → label
-    .replace(/\\faIcon\{[^}]*\}/g, "")
-    .replace(/\$\|?\$/g, "")
-    .replace(/\\\\/g, "")
-    .replace(/\\vspace\{[^}]*\}/g, "")
-    .replace(/\\hspace\{[^}]*\}/g, "")
-    .replace(/\s{2,}/g, " ")
+    .replaceAll(/\\textbf\{([^}]*)\}/g, "$1") // \textbf{x} → x
+    .replaceAll(/\\textit\{([^}]*)\}/g, "$1") // \textit{x} → x
+    .replaceAll(/\\emph\{([^}]*)\}/g, "$1") // \emph{x}   → x
+    .replaceAll(/\\small\{([^}]*)\}/g, "$1")
+    .replaceAll(/\\footnotesize\\emph\{([^}]*)\}/g, "$1")
+    .replaceAll(/\\underline\{([^}]*)\}/g, "$1")
+    .replaceAll(/\\href\{[^}]*\}\{([^}]*)\}/g, "$1") // \href{url}{label} → label
+    .replaceAll(/\\faIcon\{[^}]*\}/g, "")
+    .replaceAll(/\$\|?\$/g, "")
+    .replaceAll(String.raw`\\`, "")
+    .replaceAll(/\\vspace\{[^}]*\}/g, "")
+    .replaceAll(/\\hspace\{[^}]*\}/g, "")
+    .replaceAll(/\s{2,}/g, " ")
     .trim();
 }
 
@@ -58,8 +58,24 @@ function cleanLatex(s: string): string {
  * Returns undefined when no href is found.
  */
 function extractUrl(s: string): string | undefined {
-  const m = s.match(/\\href\{([^}]+)\}/) ?? s.match(/\\projectlink\{([^}]+)\}/);
+  const m = /\\href\{([^}]+)\}/.exec(s) ?? /\\projectlink\{([^}]+)\}/.exec(s);
   return m?.[1];
+}
+
+/** Walk from an opening `{` to its matching `}` and return the index after `}`. */
+function walkToMatchingBrace(src: string, openIdx: number): number {
+  let depth = 0;
+  let i = openIdx;
+  while (i < src.length) {
+    const ch = src.charAt(i);
+    if (ch === "{") depth++;
+    else if (ch === "}") {
+      depth--;
+      if (depth === 0) return i + 1;
+    }
+    i++;
+  }
+  return i;
 }
 
 /**
@@ -74,25 +90,11 @@ function parseArgs(
   const args: string[] = [];
   let i = pos;
   while (args.length < count && i < src.length) {
-    // skip whitespace / newlines between args
-    while (i < src.length && /[\s\n]/.test(src.charAt(i))) i++;
+    while (i < src.length && /\s/.test(src.charAt(i))) i++;
     if (i >= src.length || src.charAt(i) !== "{") break;
-    // walk to matching closing brace (handles nesting)
-    let depth = 0;
     const start = i;
-    while (i < src.length) {
-      const ch = src.charAt(i);
-      if (ch === "{") depth++;
-      else if (ch === "}") {
-        depth--;
-        if (depth === 0) {
-          i++;
-          break;
-        }
-      }
-      i++;
-    }
-    args.push(src.slice(start, i)); // includes outer braces
+    i = walkToMatchingBrace(src, start);
+    args.push(src.slice(start, i));
   }
   return [args, i];
 }
@@ -104,7 +106,7 @@ function stripAllBraces(args: string[]): string[] {
 
 /** Convert "Aug 2025 – Present" or "2021 - 2025" into a DateRange */
 function parseDateRange(raw: string): DateRange {
-  const cleaned = raw.replace(/[–—]/g, "-").trim();
+  const cleaned = raw.replaceAll("–", "-").replaceAll("—", "-").trim();
   const parts = cleaned.split("-").map((p) => p.trim());
   return {
     start: parts[0] ?? "",
@@ -140,19 +142,21 @@ function splitSections(src: string): Map<string, string> {
 
 function parseContact(src: string): ContactInfo {
   // \begin{center} ... \end{center} block
-  const centerMatch = src.match(/\\begin\{center\}([\s\S]*?)\\end\{center\}/);
+  const centerMatch = /\\begin\{center\}([\s\S]*?)\\end\{center\}/.exec(src);
   const block = centerMatch ? (centerMatch[1] ?? src) : src;
 
   // Name: \textbf{\Huge \scshape Name Name}
-  const nameMatch = block.match(/\\scshape\s+(.*?)\s*\\\\/);
-  const name = nameMatch ? cleanLatex(nameMatch[1] ?? "") : "Unknown";
+  const nameMatch = /\\scshape\s([^\\]*)\\\\/.exec(block);
+  const name = nameMatch
+    ? cleanLatex((nameMatch[1] ?? "").trimEnd())
+    : "Unknown";
 
   // Phone: \href{tel:...}{label}
-  const phoneMatch = block.match(/\\href\{tel:([^}]+)\}/);
+  const phoneMatch = /\\href\{tel:([^}]+)\}/.exec(block);
   const phone = phoneMatch?.[1] ?? "";
 
   // Email
-  const emailMatch = block.match(/\\href\{mailto:([^}]+)\}/);
+  const emailMatch = /\\href\{mailto:([^}]+)\}/.exec(block);
   const email = emailMatch?.[1] ?? "";
 
   // All links: \faIcon{icon}\href{url}{label}
@@ -185,11 +189,70 @@ function extractBullets(block: string): string[] {
   const re = /\\resumeItem\{/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(block)) !== null) {
-    const [args] = parseArgs(block, m.index + "\\resumeItem".length, 1);
+    const [args] = parseArgs(
+      block,
+      m.index + String.raw`\resumeItem`.length,
+      1,
+    );
     const arg = args[0];
     if (arg) bullets.push(cleanLatex(stripBraces(arg)));
   }
   return bullets;
+}
+
+// ─────────────────────────────────────────────
+//  Education Parser helpers
+// ─────────────────────────────────────────────
+
+function parseGpaFromExtra(
+  extra: string | undefined,
+): EducationEntry["gpa"] | undefined {
+  if (!extra) return undefined;
+
+  const parts = extra.split("/");
+  if (parts.length !== 2) return undefined;
+
+  const valueStr = (parts[0] ?? "").trim();
+  const scaleStr = (parts[1] ?? "").trim();
+
+  const isValid = (s: string) => /^\d+(\.\d+)?$/.test(s);
+
+  if (!isValid(valueStr) || !isValid(scaleStr)) return undefined;
+
+  return {
+    value: Number.parseFloat(valueStr),
+    scale: Number.parseFloat(scaleStr),
+    display: `${valueStr}/${scaleStr}`,
+  };
+}
+
+function parseHonoursFromExtra(extra: string | undefined): string[] {
+  if (!extra) return [];
+  const honours: string[] = [];
+  const re = /\\textbf\{([^}]+)\}/g;
+  for (const m of extra.matchAll(re)) {
+    const h = m[1];
+    if (h === undefined) continue;
+    if (/\d/.test(h)) continue;
+    honours.push(h);
+  }
+  return honours;
+}
+
+function parseDegreeAndField(degreeClean: string): {
+  degree: string;
+  field?: string;
+} {
+  const idx = degreeClean.indexOf(",");
+
+  if (idx === -1) {
+    return { degree: degreeClean };
+  }
+
+  const degree = degreeClean.slice(0, idx).trim();
+  const field = degreeClean.slice(idx + 1).trim();
+
+  return field ? { degree, field } : { degree };
 }
 
 // ─────────────────────────────────────────────
@@ -205,47 +268,29 @@ function parseEducation(block: string): EducationEntry[] {
     const [rawArgs, afterArgs] = parseArgs(block, m.index + m[0].length, 4);
     const [institution, period, degree, extra] = stripAllBraces(rawArgs);
 
-    // Parse GPA: "GPA: 9.54/10.0" or similar
-    let gpa: EducationEntry["gpa"] | undefined;
-    const gpaMatch = extra?.match(/([\d.]+)\/([\d.]+)/);
-    if (gpaMatch) {
-      const gpaValue = gpaMatch[1] ?? "";
-      const gpaScale = gpaMatch[2] ?? "";
-      gpa = {
-        value: parseFloat(gpaValue),
-        scale: parseFloat(gpaScale),
-        display: `${gpaValue}/${gpaScale}`,
-      };
-    }
-
-    // Honours: bold tokens after GPA, e.g. \textbf{Gold Medalist}
-    const honours: string[] = [];
-    const honourRe = /\\textbf\{([^}]+)\}/g;
-    for (const hm of (extra ?? "").matchAll(honourRe)) {
-      const h = hm[1];
-      if (h && !h.match(/[\d.]/)) honours.push(h);
-    }
-
-    // Find bullets belonging to this entry
-    const nextSubheading = block.indexOf("\\resumeSubheading", m.index + 1);
+    const gpa = parseGpaFromExtra(extra);
+    const honours = parseHonoursFromExtra(extra);
+    const nextSubheading = block.indexOf(
+      String.raw`\resumeSubheading`,
+      m.index + 1,
+    );
     const slice = block.slice(
       afterArgs,
       nextSubheading === -1 ? undefined : nextSubheading,
     );
 
     const degreeClean = cleanLatex(degree ?? "");
-    const degreeMatch = degreeClean.match(/^(.+?),\s*(.+)$/);
+    const { degree: parsedDegree, field } = parseDegreeAndField(degreeClean);
+    const notes = extractBullets(slice);
 
     entries.push({
       institution: cleanLatex(institution ?? ""),
-      degree: degreeMatch
-        ? (degreeMatch[1]?.trim() ?? degreeClean)
-        : degreeClean,
-      ...(degreeMatch?.[2] ? { field: degreeMatch[2].trim() } : {}),
+      degree: parsedDegree,
+      ...(field ? { field } : {}),
       period: parseDateRange(cleanLatex(period ?? "")),
-      ...(gpa !== undefined ? { gpa } : {}),
+      ...(gpa ? { gpa } : {}),
       ...(honours.length ? { honours } : {}),
-      ...(extractBullets(slice).length ? { notes: extractBullets(slice) } : {}),
+      ...(notes.length ? { notes } : {}),
     });
   }
   return entries;
@@ -267,7 +312,7 @@ function parseExperience(block: string): ExperienceEntry[] {
     const end = positions[i + 1] ?? block.length;
     const [rawArgs, afterArgs] = parseArgs(
       block,
-      start + "\\resumeSubheading".length,
+      start + String.raw`\resumeSubheading`.length,
       4,
     );
     const [role, period, company, location] = stripAllBraces(rawArgs);
@@ -311,14 +356,14 @@ function parseProjects(block: string): ProjectEntry[] {
     const end = positions[i + 1] ?? block.length;
     const [rawArgs, afterArgs] = parseArgs(
       block,
-      start + "\\resumeProjectHeading".length,
+      start + String.raw`\resumeProjectHeading`.length,
       2,
     );
     const [titleBlock, periodRaw] = stripAllBraces(rawArgs);
 
     const titleBlockStr = titleBlock ?? "";
     // Title: first \textbf{...}
-    const titleMatch = titleBlockStr.match(/\\textbf\{([^}]+)\}/);
+    const titleMatch = /\\textbf\{([^}]+)\}/.exec(titleBlockStr);
     const title = titleMatch
       ? (titleMatch[1] ?? cleanLatex(titleBlockStr))
       : cleanLatex(titleBlockStr);
@@ -327,7 +372,7 @@ function parseProjects(block: string): ProjectEntry[] {
     const repoUrl = extractUrl(titleBlockStr);
 
     // Tech stack: inside \emph{...}
-    const techMatch = titleBlockStr.match(/\\emph\{([^}]+)\}/);
+    const techMatch = /\\emph\{([^}]+)\}/.exec(titleBlockStr);
     const techStack: string[] = techMatch?.[1]
       ? techMatch[1]
           .split(",")
@@ -363,7 +408,7 @@ function parseSkills(block: string): SkillsSection {
     if (!cat || !skillsRaw) continue;
     const category = cat.trim();
     const skills = skillsRaw
-      .replace(/^:\s*/, "")
+      .replaceAll(/^:\s*/, "")
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
@@ -388,7 +433,7 @@ function parseExtracurriculars(block: string): ActivityEntry[] {
     const end = positions[i + 1] ?? block.length;
     const [rawArgs, afterArgs] = parseArgs(
       block,
-      start + "\\resumeSubheading".length,
+      start + String.raw`\resumeSubheading`.length,
       4,
     );
     const [role, period, organisation, location] = stripAllBraces(rawArgs);
@@ -419,10 +464,10 @@ function parseExtracurriculars(block: string): ActivityEntry[] {
  */
 export function parseLatexResume(latexSource: string): Resume {
   // Strip comments
-  const src = latexSource.replace(/%.*$/gm, "").replace(/\r\n/g, "\n");
+  const src = latexSource.replaceAll(/%[^\n]*/gm, "").replaceAll("\r\n", "\n");
 
   // Extract the \begin{document}...\end{document} body
-  const docMatch = src.match(/\\begin\{document\}([\s\S]*?)\\end\{document\}/);
+  const docMatch = /\\begin\{document\}([\s\S]*?)\\end\{document\}/.exec(src);
   const body = docMatch ? (docMatch[1] ?? src) : src;
 
   // Parse contact from the \begin{center} block
@@ -477,7 +522,7 @@ export function buildTechCloud(resume: Resume): TechCloud {
       tokens.forEach((t) => set.add(t));
     }
   }
-  return [...set].sort();
+  return [...set].sort((a, b) => a.localeCompare(b));
 }
 
 /** Calculate high-level summary stats for a portfolio hero section */
@@ -486,7 +531,7 @@ export function buildSummaryStats(resume: Resume): ResumeSummaryStats {
   const allStarts = resume.experience.map((e) =>
     new Date(e.period.start).getFullYear(),
   );
-  const earliest = Math.min(...allStarts.filter((y) => !isNaN(y)));
+  const earliest = Math.min(...allStarts.filter((y) => !Number.isNaN(y)));
   const yearsOfExperience = new Date().getFullYear() - earliest;
 
   const companies = new Set(resume.experience.map((e) => e.company));

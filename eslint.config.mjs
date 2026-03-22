@@ -1,19 +1,24 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import globals from "globals";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export default tseslint.config(
+const tsFiles = ["**/*.ts", "**/*.tsx"];
+
+export default [
   {
-    ignores: ["node_modules/**", ".next/**", "jest.config.js"],
+    ignores: ["node_modules/**", ".next/**", "jest.config.js", ".vscode"],
   },
   js.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked.map((config) => ({
+    ...config,
+    files: tsFiles,
+  })),
   {
-    files: ["**/*.ts", "**/*.tsx"],
-    extends: [tseslint.configs.recommendedTypeChecked],
+    files: tsFiles,
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -36,4 +41,4 @@ export default tseslint.config(
       "no-console": "warn",
     },
   },
-);
+];

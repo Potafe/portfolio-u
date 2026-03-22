@@ -8,13 +8,11 @@
 //  Primitives & Shared Types
 // ----------------------------
 
-/** ISO-8601 date string ("2024-01") or human label ("Jan 2025") or "Present" */
-export type DateString = string;
-
 export interface DateRange {
-  start: DateString;
+  /** ISO-8601 date string, human label ("Jan 2025"), or "Present" */
+  start: string;
   /** ISO date string, or "Present" for ongoing roles */
-  end: DateString;
+  end: string;
 }
 
 export interface Link {
@@ -135,7 +133,7 @@ export interface ActivityEntry {
 export interface Certification {
   title: string;
   issuer: string;
-  date?: DateString;
+  date?: string;
   credentialUrl?: string;
   credentialId?: string;
 }
@@ -144,7 +142,7 @@ export interface Publication {
   title: string;
   authors: string[];
   venue: string;
-  date?: DateString;
+  date?: string;
   url?: string;
   doi?: string;
 }
@@ -152,7 +150,7 @@ export interface Publication {
 export interface Award {
   title: string;
   issuer?: string;
-  date?: DateString;
+  date?: string;
   description?: string;
 }
 
@@ -171,7 +169,7 @@ export interface Resume {
   /** Metadata about the resume file / version itself */
   meta?: {
     version?: string;
-    lastUpdated?: DateString;
+    lastUpdated?: string;
     /** "en", "hi", etc. */
     language?: string;
     sourceFile?: string; // e.g. "resume.tex"
@@ -198,18 +196,6 @@ export interface Resume {
 
 /** Flat list of all unique technologies mentioned anywhere in the resume */
 export type TechCloud = string[];
-
-export interface ResumeSummaryStats {
-  yearsOfExperience: number;
-  numberOfProjects: number;
-  numberOfCompanies: number;
-  topSkills: string[];
-  latestRole: {
-    role: string;
-    company: string;
-    period: DateRange;
-  };
-}
 
 /** Summary stats useful for a portfolio "at a glance" section */
 export interface ResumeSummaryStats {
