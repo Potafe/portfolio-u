@@ -10,7 +10,7 @@
     "@gsap/react": "^2.1.2",
     "@studio-freight/react-lenis": "^0.0.47",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.35.1",
+    "framer-motion": "^12.38.0",
     "gsap": "^3.14.2",
     "lenis": "^1.3.18",
     "next": "^16.1.6",
