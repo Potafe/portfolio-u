@@ -5,11 +5,11 @@
     "@eslint/js": "^10.0.1",
     "@microsoft/eslint-formatter-sarif": "^3.1.0",
     "@types/node": "^25.6.0",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.17",
     "@typescript-eslint/eslint-plugin": "^8.58.1",
     "@typescript-eslint/parser": "^8.58.1",
     "eslint": "^10.2.0",
-    "eslint-config-next": "^16.2.2",
+    "eslint-config-next": "^16.2.9",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.5.0",
     "husky": "^9.1.7",
@@ -19,7 +19,7 @@
     "typescript-eslint": "^8.58.1"
   },
   "dependencies": {
-    "@expo-google-fonts/tinos": "^0.4.1",
+    "@expo-google-fonts/tinos": "^0.4.2",
     "@fontsource/tinos": "^5.2.7",
     "@gsap/react": "^2.1.2",
     "@react-pdf/renderer": "^4.4.1",
@@ -27,10 +27,10 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.1",
     "gsap": "^3.14.2",
-    "lenis": "^1.3.21",
-    "next": "^16.2.2",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "lenis": "^1.3.25",
+    "next": "^16.2.9",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "tailwindcss": "^4.2.1"
   },
   "scripts": {
